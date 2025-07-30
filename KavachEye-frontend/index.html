@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KavachEye - Women Safety Platform</title>
+    <link rel="icon" href="images/logo.png">
+    <meta name="description"
+        content="KavachEye - A Better Tomorrow for Women. Advanced AI-powered women safety platform with real-time monitoring and alert systems.">
+    <meta name="keywords" content="women safety, AI security, real-time monitoring, safety platform, KavachEye">
+    <meta name="author" content="KavachEye Team">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="KavachEye - Women Safety Platform">
+    <meta property="og:description" content="A Better Tomorrow for Women. Advanced AI-powered women safety platform.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kavacheye.vercel.app">
+    <meta property="og:image" content="images/logo.png">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="KavachEye - Women Safety Platform">
+    <meta name="twitter:description" content="A Better Tomorrow for Women. Advanced AI-powered women safety platform.">
+    <meta name="twitter:image" content="images/logo.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(130, 181, 146, 1) 0%, rgba(76, 191, 228, 1) 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        .redirect-container {
+            text-align: center;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, #f0f0f0, #fff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: logoGlow 2s ease-in-out infinite;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .redirect-text {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes logoGlow {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .tagline {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="redirect-container">
+        <div class="logo">KavachEye</div>
+        <div class="tagline">A Better Tomorrow for Women</div>
+        <div class="loading-spinner"></div>
+        <div class="redirect-text">Redirecting to application...</div>
+    </div>
+
+    <script>
+        // Redirect to preloader after a short delay
+        setTimeout(() => {
+            window.location.href = 'preloader.html';
+        }, 2000);
+    </script>
+</body>
+
+</html>

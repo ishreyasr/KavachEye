@@ -1,0 +1,17 @@
+services:
+  kavacheye-model:
+    build: .
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - PYTHONPATH=/app
+    volumes:
+      - ./:/app
+    restart: unless-stopped
+    networks:
+      - kavacheye-network
+
+networks:
+  kavacheye-network:
+    driver: bridge

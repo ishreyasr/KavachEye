@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KavachEye - Analytics Page</title>
+    <link rel="icon" href="favicon/android-chrome-192x192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#2b5797">
+    <meta name="theme-color" content="#ffffff">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            font-family: Arial, sans-serif;
+            height: 100%;
+            background-color: #f5f7fa;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 25%, #3498db 50%, #2980b9 75%, #1f618d 100%);
+            padding: 20px;
+            color: #ffffff;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-header {
+            position: relative;
+            bottom: 23px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .sidebar-header img {
+            position: relative;
+            right: 30px;
+            width: 120px;
+            height: 100px;
+            border-radius: 50%;
+            padding: 5px;
+        }
+
+        .sidebar-header h2 {
+            font-weight: bold;
+            font-size: 30px;
+            position: relative;
+            right: 60px;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s, background-color 0.3s;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .sidebar a:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 25%, #3498db 50%, #2980b9 75%, #1f618d 100%);
+            color: #ffffff;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            width: calc(100% - 250px);
+            position: fixed;
+            top: 0;
+            left: 250px;
+            z-index: 1000;
+        }
+
+        .navbar h1 {
+            position: relative;
+            left: 15px;
+        }
+
+        .search-filter {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container {
+            position: relative;
+            margin-right: 15px;
+        }
+
+        .search-container input {
+            background-color: #e8e9ea;
+            border: 1px solid #e1e5eb;
+            color: #333;
+            padding: 8px 30px 8px 10px;
+            border-radius: 20px;
+            width: 350px;
+            transition: width 0.3s ease;
+        }
+
+        .search-container input:focus {
+            width: 400px;
+            outline: none;
+        }
+
+        .search-container i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+
+        .location-container {
+            position: relative;
+            margin-right: 15px;
+        }
+
+        .location-container select {
+            appearance: none;
+            border: white;
+            background: none;
+            width: 10px;
+            color: #ffffff;
+            padding: 8px 20px 8px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: width 0.3s ease;
+        }
+
+        .location-container select:hover {
+            position: relative;
+            left: 12px;
+            width: 90px;
+        }
+
+        .location-container i {
+            position: absolute;
+            left: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffffff;
+            pointer-events: none;
+        }
+
+        .pipe {
+            color: #ffffff;
+            position: relative;
+            right: 7px;
+            bottom: 2px;
+            font-size: 25px;
+        }
+
+        .filter-container {
+            position: relative;
+        }
+
+        .filter-container select {
+            appearance: none;
+            border: none;
+            width: 30px;
+            padding: 8px 10px 8px 10px;
+            border-radius: 20px;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: width 0.3s ease;
+        }
+
+        .filter-container select:hover {
+            color: 173F5F;
+            position: relative;
+            left: 15px;
+            width: 90px;
+        }
+
+        .filter-container i {
+            position: absolute;
+            right: 7px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffffff;
+            pointer-events: none;
+        }
+
+        .filter-container select {
+            background: none;
+        }
+
+        .user-container {
+            position: relative;
+        }
+
+        .user-container i {
+            position: absolute;
+            right: 1px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffffff;
+            pointer-events: none;
+        }
+
+        .user-container select {
+            background-color: #000000;
+        }
+
+        .user-container select {
+            color: rgb(0, 0, 0);
+            appearance: none;
+            position: relative;
+            left: 7px;
+            border: black;
+            width: 80px;
+            padding: 8px 10px 8px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            background-color: #ffffff;
+            transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
+        }
+
+        .user-container select:hover {
+            background-color: rgb(0, 0, 0);
+            color: #ffffff;
+            border: 1px solid black;
+        }
+
+        .user-container i {
+            position: absolute;
+            right: 1px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #000000;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        .user-container select:hover+i {
+            color: #ffffff;
+        }
+
+        #profileView {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 320px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            padding: 25px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        #profileView::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid #ffffff;
+        }
+
+        #profilePicture {
+            width: 110px;
+            height: 110px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #1b2250;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        #profilePicture:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #uploadInput {
+            display: none;
+        }
+
+        #profileView h3 {
+            margin-top: 15px;
+            color: #1b2250;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        #profileView p {
+            margin-bottom: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+            color: #555555;
+        }
+
+        #profileView button {
+            width: 100%;
+            padding: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1b2250;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        #profileView button:hover {
+            background-color: #25338a;
+            transform: translateY(-3px);
+        }
+
+        .incident-reports {
+            height: auto;
+            width: 910px;
+            overflow: hidden;
+            position: relative;
+            right: 5px;
+            margin-top: 40px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            padding-bottom: 30px;
+            box-sizing: border-box;
+        }
+
+        .incident-reports h2 {
+            color: #173F5F;
+            margin-bottom: 10px;
+        }
+
+        .incident-reports p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .incident-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .incident-table th,
+        .incident-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .incident-table th {
+            background-color: #f2f2f2;
+            color: #173F5F;
+        }
+
+        .incident-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .incident-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .charts-container {
+            position: relative;
+            left: 2px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 15px;
+            margin-top: 100px;
+            padding: 0 20px;
+        }
+
+        .chart-wrapper {
+            background-color: #ffffff;
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            height: 300px;
+        }
+
+        .gender-chart {
+            width: 420px;
+            grid-column: 1 / 2;
+            grid-row: 1 / 2;
+        }
+
+        .gender-chart h1 {
+            position: relative;
+            left: 80px;
+        }
+
+        .incident-chart {
+            width: 420px;
+            grid-column: 1 / 2;
+            grid-row: 2 / 3;
+        }
+
+        .incident-chart h1 {
+            position: relative;
+            left: 100px;
+        }
+
+        .anomaly-chart {
+            position: relative;
+            right: 200px;
+            width: 420px;
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+        }
+
+        .anomaly-chart h1 {
+            position: relative;
+            left: 80px;
+        }
+
+        .overall-gender-chart {
+            position: relative;
+            right: 200px;
+            width: 420px;
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+        }
+
+        .overall-gender-chart h1 {
+            position: relative;
+            left: 45px;
+        }
+
+        .real-time-monitoring-chart {
+            width: 420px;
+            grid-column: 1 / 2;
+            grid-row: 3 / 4;
+        }
+
+        .real-time-monitoring-chart h1 {
+            position: relative;
+            left: 70px;
+        }
+
+        .real-time-threat-chart {
+            position: relative;
+            right: 200px;
+            width: 420px;
+            grid-column: 2 / 3;
+            grid-row: 3 / 4;
+        }
+
+        .real-time-threat-chart h1 {
+            position: relative;
+            left: 42px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #173F5F;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .right-panel {
+            position: fixed;
+            top: 105px;
+            right: 10px;
+            width: 400px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            height: calc(100vh - 120px);
+            overflow: hidden;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notifications-header {
+            position: relative;
+            top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .notifications-header h2 {
+            font-size: 24px;
+            color: #000000;
+            margin: 0;
+        }
+
+        #current-time {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .notifications-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .notification-item {
+            position: relative;
+            top: 30px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .notification-item:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .notification-item.warning {
+            border-left: 4px solid #ffc107;
+        }
+
+        .notification-item.danger {
+            border-left: 4px solid #dc3545;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .notification-icon {
+            font-size: 18px;
+        }
+
+        .notification-location {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .view-all-btn {
+            background-color: #173F5F;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .view-all-btn:hover {
+            background-color: #122f47;
+        }
+
+
+
+        .cssbuttons-io {
+            position: relative;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            border-radius: 0.8em;
+            cursor: pointer;
+            border: none;
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            color: ghostwhite;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+        }
+
+        .cssbuttons-io svg {
+            width: 1em;
+            height: 1em;
+            margin-right: 0.3em;
+        }
+
+        .cssbuttons-io span {
+            position: relative;
+            z-index: 10;
+            transition: color 0.4s;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4em 0.8em 0.4em 0.7em;
+        }
+
+        .cssbuttons-io::before,
+        .cssbuttons-io::after {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .cssbuttons-io::before {
+            content: "";
+            background: #000;
+            width: 120%;
+            left: -10%;
+            transform: skew(30deg);
+            transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+        }
+
+        .cssbuttons-io:hover::before {
+            transform: translate3d(100%, 0, 0);
+        }
+
+        .cssbuttons-io:active {
+            transform: scale(0.95);
+        }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 15px;
+            }
+
+            .sidebar-header {
+                bottom: 0;
+                margin-bottom: 20px;
+            }
+
+            .sidebar-header img {
+                width: 80px;
+                height: 70px;
+                right: 15px;
+            }
+
+            .sidebar-header h2 {
+                font-size: 24px;
+                right: 30px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                margin-top: 20px;
+                padding: 15px;
+            }
+
+            .navbar {
+                width: 100%;
+                left: 0;
+                padding: 20px 15px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .navbar h1 {
+                text-align: center;
+                font-size: 24px;
+            }
+
+            .search-filter {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .search-container input {
+                width: 100%;
+            }
+
+            .search-container input:focus {
+                width: 100%;
+            }
+
+            .location-container,
+            .filter-container,
+            .user-container {
+                width: 100%;
+            }
+
+            .location-container select,
+            .filter-container select,
+            .user-container select {
+                width: 100%;
+                text-align: center;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 15px;
+            }
+
+            .chart-wrapper {
+                width: 100%;
+            }
+
+            .chart-container {
+                padding: 15px;
+            }
+
+            .chart-container h1 {
+                font-size: 18px;
+            }
+
+            .notifications-panel {
+                width: 100%;
+                margin-top: 20px;
+            }
+
+            #profileView {
+                width: 90%;
+                right: 5%;
+                left: 5%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                padding: 10px;
+            }
+
+            .sidebar-header h2 {
+                font-size: 20px;
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+
+            .navbar {
+                padding: 15px 10px;
+            }
+
+            .navbar h1 {
+                font-size: 20px;
+            }
+
+            .charts-container {
+                padding: 10px;
+                gap: 15px;
+            }
+
+            .chart-container {
+                padding: 10px;
+            }
+
+            .chart-container h1 {
+                font-size: 16px;
+            }
+
+            .notifications-panel {
+                padding: 15px;
+            }
+
+            .notification-item {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/logo.png" alt="Logo">
+                <h2>KavachEye</h2>
+            </div>
+            <ul>
+                <li><a href="profilepage.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="livefeeds.html"><i class="fas fa-video"></i> Live Feeds</a></li>
+                <li><a href="analyticspage.html"><i class="fas fa-chart-line"></i> Analytics</a></li>
+                <li><a href="issuespage.html"><i class="fas fa-bell"></i> Issues</a></li>
+                <li><a href="settingspage.html"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="navbar">
+                <h1 style="color: white; font-size: 30px;">Analytics</h1>
+                <div class="search-filter">
+                    <div class="search-container">
+                        <input type="text" placeholder="Search the contents...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="location-container">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <select>
+                            <option value="all" style="background-color: #cbc8c8;">Location</option>
+                            <option value="location1" style="background-color: #cbc8c8;">Location 1</option>
+                            <option value="location2" style="background-color: #cbc8c8;">Location 2</option>
+                            <option value="location3" style="background-color: #cbc8c8;">Location 3</option>
+                        </select>
+                    </div>
+                    <div class="pipe">
+                        <p> | </p>
+                    </div>
+
+                    <div class="user-container" style="position: relative;">
+                        <button class="cssbuttons-io" id="profileButton">
+                            <span>
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none"></path>
+                                    <path
+                                        d="M24 12l-5.657 5.657-1.414-1.414L21.172 12l-4.243-4.243 1.414-1.414L24 12zM2.828 12l4.243 4.243-1.414 1.414L0 12l5.657-5.657L7.07 7.757 2.828 12zm6.96 9H7.66l6.552-18h2.128L9.788 21z"
+                                        fill="currentColor"></path>
+                                </svg>
+                                profile
+                            </span>
+                        </button>
+                        <div id="profileView"
+                            style="display: none; position: absolute; top: 100%; right: 0; width: 300px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 1000; padding: 20px; margin-top: 10px;">
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <img id="profilePicture"
+                                    src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjRENEQ0RDIi8+CjxyZWN0IHg9IjMwIiB5PSI1NSIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRENEQ0RDIi8+Cjwvc3ZnPgo="
+                                    alt="Profile Picture"
+                                    style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #003366;">
+                                <h3 id="userName" style="margin-top: 10px; color: #214c62;">Loading...</h3>
+                            </div>
+                            <input type="file" id="uploadInput" accept="image/*">
+                            <div style="margin-bottom: 20px;">
+                                <p style="margin-bottom: 5px;"><strong>Username :</strong> <span
+                                        id="userUsername">Loading...</span></p>
+                                <p style="margin-bottom: 5px;"><strong>Department :</strong> <span
+                                        id="userDepartment">Loading...</span></p>
+                                <p style="margin-bottom: 5px;"><strong>Email :</strong> <span
+                                        id="userEmail">Loading...</span></p>
+                                <p style="margin-bottom: 5px;"><strong>Phone No :</strong> <span
+                                        id="userPhone">Loading...</span></p>
+                            </div>
+                            <button onclick="logOut()"
+                                style="width: 100%; padding: 10px; background-color: #214c62; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">Log
+                                Out</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="charts-container">
+                <div class="chart-wrapper gender-chart">
+                    <div class="chart-container">
+                        <h1>Gender Detection</h1>
+                        <canvas id="genderChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-wrapper incident-chart">
+                    <div class="chart-container">
+                        <h1>Incident Trends</h1>
+                        <canvas id="incidentTrendsChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-wrapper anomaly-chart">
+                    <div class="chart-container">
+                        <h1>Anomaly Detection</h1>
+                        <canvas id="anomalyChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-wrapper overall-gender-chart">
+                    <div class="chart-container">
+                        <h1>Overall Gender Distribution</h1>
+                        <canvas id="overallGenderChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-wrapper real-time-monitoring-chart">
+                    <div class="chart-container">
+                        <h1>Real-Time Monitoring</h1>
+                        <canvas id="realTimeMonitoringChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-wrapper real-time-threat-chart">
+                    <div class="chart-container">
+                        <h1>Real-Time Threat Detection</h1>
+                        <canvas id="realTimeThreatChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="incident-reports">
+                <h2>Incident Reports</h2>
+                <p>Detailed reports on incidents, trends, and recommended actions for law enforcement.</p>
+                <table class="incident-table">
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Time</th>
+                            <th>Incident Type</th>
+                            <th>Severity</th>
+                            <th>Recommended Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Downtown Plaza</td>
+                            <td>8:30 PM</td>
+                            <td>Harassment</td>
+                            <td>Medium</td>
+                            <td>Increase police presence, install additional surveillance cameras</td>
+                        </tr>
+                        <tr>
+                            <td>Riverside Park</td>
+                            <td>11:00 PM</td>
+                            <td>Assault</td>
+                            <td>High</td>
+                            <td>Immediate response, secure the area, and investigate the incident</td>
+                        </tr>
+                        <tr>
+                            <td>Shopping Mall</td>
+                            <td>6:45 PM</td>
+                            <td>Stalking</td>
+                            <td>Medium</td>
+                            <td>Increase security patrols, provide safety education to visitors</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="right-panel">
+                <div class="notifications-header">
+                    <h2>Notifications</h2>
+                    <span id="current-time"></span>
+                </div>
+                <div class="notifications-container" id="notifications-container">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header">
+        <img src="images/logo.png" alt="KavachEye Logo" class="logo">
+        <div class="title">KavachEye</div>
+    </div>
+
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            const profileButton = document.getElementById('profileButton');
+            const profileView = document.getElementById('profileView');
+
+            if (profileButton && profileView) {
+                profileButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    console.log('Profile button clicked!');
+                    profileView.style.display = profileView.style.display === 'none' ? 'block' : 'none';
+                });
+
+                // Close profile view when clicking outside
+                document.addEventListener('click', function (event) {
+                    if (!profileView.contains(event.target) && event.target !== profileButton && !profileButton.contains(event.target)) {
+                        profileView.style.display = 'none';
+                    }
+                });
+            } else {
+                console.error('Profile button or view not found!');
+            }
+        });
+
+        document.getElementById('profilePicture').addEventListener('click', function () {
+            document.getElementById('uploadInput').click();
+        });
+
+        document.getElementById('uploadInput').addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('profilePicture').src = e.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        function logOut() {
+            window.location.href = 'loginpage.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Gender Detection Chart
+            const genderCtx = document.getElementById('genderChart').getContext('2d');
+            let genderChart;
+
+            function createGenderChart() {
+                if (genderChart) {
+                    genderChart.destroy();
+                }
+
+                genderChart = new Chart(genderCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Female', 'Male'],
+                        datasets: [{
+                            label: 'Gender Detection',
+                            data: [60, 40],
+                            backgroundColor: ['#FF69B4', '#1E90FF']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Anomaly Detection Chart
+            const anomalyCtx = document.getElementById('anomalyChart').getContext('2d');
+            let anomalyChart;
+
+            function createAnomalyChart() {
+                if (anomalyChart) {
+                    anomalyChart.destroy();
+                }
+
+                anomalyChart = new Chart(anomalyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Normal Activity',
+                            data: [45, 59, 80, 81, 56, 55],
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        }, {
+                            label: 'Anomalies',
+                            data: [null, null, 62, null, 58, null],
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            pointRadius: 8,
+                            pointHoverRadius: 12,
+                            showLine: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Incident Trends Chart
+            const incidentTrendsCtx = document.getElementById('incidentTrendsChart').getContext('2d');
+            let incidentTrendsChart;
+
+            function createIncidentTrendsChart() {
+                if (incidentTrendsChart) {
+                    incidentTrendsChart.destroy();
+                }
+
+                incidentTrendsChart = new Chart(incidentTrendsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Incident Type 1',
+                            data: [45, 138, 62, 145, 26, 155],
+                            borderColor: 'rgb(53, 162, 235)',
+                            backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                            tension: 0.1
+                        }, {
+                            label: 'Incident Type 2',
+                            data: [60, 48, 180, 78, 95, 205],
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 250
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Overall Gender Distribution Chart
+            const overallGenderCtx = document.getElementById('overallGenderChart').getContext('2d');
+            let overallGenderChart;
+
+            function createOverallGenderChart() {
+                if (overallGenderChart) {
+                    overallGenderChart.destroy();
+                }
+
+                overallGenderChart = new Chart(overallGenderCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Female', 'Male'],
+                        datasets: [{
+                            data: [60, 40],
+                            backgroundColor: ['#FF69B4', '#1E90FF']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Real-Time Monitoring Chart
+            const realTimeMonitoringCtx = document.getElementById('realTimeMonitoringChart').getContext('2d');
+            let realTimeMonitoringChart;
+
+            function createRealTimeMonitoringChart() {
+                if (realTimeMonitoringChart) {
+                    realTimeMonitoringChart.destroy();
+                }
+
+                realTimeMonitoringChart = new Chart(realTimeMonitoringCtx, {
+                    type: 'line',
+                    data: {
+                        labels: Array(60).fill(''),
+                        datasets: [{
+                            label: 'Activity Level',
+                            data: Array(60).fill(0),
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                display: false
+                            },
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        },
+                        animation: {
+                            duration: 0
+                        }
+                    }
+                });
+            }
+
+            // Real-Time Threat Detection Chart
+            const realTimeThreatCtx = document.getElementById('realTimeThreatChart').getContext('2d');
+            let realTimeThreatChart;
+
+            function createRealTimeThreatChart() {
+                if (realTimeThreatChart) {
+                    realTimeThreatChart.destroy();
+                }
+
+                realTimeThreatChart = new Chart(realTimeThreatCtx, {
+                    type: 'line',
+                    data: {
+                        labels: Array(60).fill(''),
+                        datasets: [{
+                            label: 'Threat Level',
+                            data: Array(60).fill(0),
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            tension: 0.1,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                display: false
+                            },
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        },
+                        animation: {
+                            duration: 0
+                        }
+                    }
+                });
+            }
+
+            // Initialize all charts
+            createGenderChart();
+            createAnomalyChart();
+            createIncidentTrendsChart();
+            createOverallGenderChart();
+            createRealTimeMonitoringChart();
+            createRealTimeThreatChart();
+
+            // Update charts periodically
+            setInterval(() => {
+                // Gender Detection Chart
+                genderChart.data.datasets[0].data = [Math.random() * 100, Math.random() * 100];
+                genderChart.update();
+
+                // Anomaly Detection Chart
+                anomalyChart.data.datasets[0].data = anomalyChart.data.datasets[0].data.map(() => Math.random() * 100);
+                anomalyChart.data.datasets[1].data = anomalyChart.data.datasets[1].data.map(() => Math.random() > 0.7 ? Math.random() * 100 : null);
+                anomalyChart.update();
+
+                // Incident Trends Chart
+                incidentTrendsChart.data.datasets.forEach(dataset => {
+                    dataset.data = dataset.data.map(() => Math.random() * 250);
+                });
+                incidentTrendsChart.update();
+
+                // Overall Gender Distribution Chart
+                const femalePercentage = Math.random() * 100;
+                overallGenderChart.data.datasets[0].data = [femalePercentage, 100 - femalePercentage];
+                overallGenderChart.update();
+            }, 5000);
+
+            // Update Real-Time Monitoring and Threat Detection charts every second
+            setInterval(() => {
+                // Real-Time Monitoring Chart
+                realTimeMonitoringChart.data.datasets[0].data.push(Math.random() * 100);
+                realTimeMonitoringChart.data.datasets[0].data.shift();
+                realTimeMonitoringChart.update();
+
+                // Real-Time Threat Detection Chart
+                realTimeThreatChart.data.datasets[0].data.push(Math.random() * 100);
+                realTimeThreatChart.data.datasets[0].data.shift();
+                realTimeThreatChart.update();
+            }, 1000);
+        });
+
+        // Notifications data
+        const notifications = [
+            { id: 1, title: 'Suspicious Activity Detected', location: 'Camera 2', time: '2 minutes ago', type: 'warning' },
+            { id: 2, title: 'Potential Threat Detected', location: 'Camera 4', time: '5 minutes ago', type: 'danger' },
+            { id: 3, title: 'Suspicious Activity Detected', location: 'Camera 7', time: '10 minutes ago', type: 'warning' },
+            { id: 4, title: 'Suspicious Activity Detected', location: 'Camera 2', time: '2 minutes ago', type: 'warning' },
+            { id: 5, title: 'Potential Threat Detected', location: 'Camera 4', time: '5 minutes ago', type: 'danger' },
+        ];
+
+        // Function to create a notification item
+        function createNotificationItem(notification) {
+            return `
+                <div class="notification-item ${notification.type}">
+                    <div class="notification-header">
+                        <span class="notification-title">${notification.title}</span>
+                        <span class="notification-icon">
+                            ${notification.type === 'danger' ? '⚠️' : '⚠️'}
+                        </span>
+                    </div>
+                    <div class="notification-location">${notification.location}</div>
+                    <div class="notification-time">${notification.time}</div>
+                </div>
+            `;
+        }
+
+        // Function to render notifications
+        function renderNotifications() {
+            const container = document.getElementById('notifications-container');
+            container.innerHTML = notifications.map(createNotificationItem).join('');
+        }
+
+        // Function to update current time
+        function updateCurrentTime() {
+            const timeElement = document.getElementById('current-time');
+            timeElement.textContent = new Date().toLocaleTimeString();
+        }
+
+        // Initial render
+        renderNotifications();
+        updateCurrentTime();
+
+        // Load user data from localStorage
+        function loadUserData() {
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                const user = JSON.parse(userData);
+                document.getElementById('userName').textContent = `${user.first_name} ${user.last_name}`;
+                document.getElementById('userUsername').textContent = user.username || 'N/A';
+                document.getElementById('userDepartment').textContent = user.department || 'N/A';
+                document.getElementById('userEmail').textContent = user.email || 'N/A';
+                document.getElementById('userPhone').textContent = user.phone || 'N/A';
+            } else {
+                // If no user data, redirect to login
+                window.location.href = 'loginpage.html';
+            }
+        }
+
+        // Load user data when page loads
+        loadUserData();
+
+        // Update time every second
+        setInterval(updateCurrentTime, 1000);
+
+        // Add click event for "View All" button
+        document.querySelector('.view-all-btn').addEventListener('click', function () {
+            alert('Viewing all notifications...');
+            // Add your logic here to show all notifications
+        });
+    </script>
+</body>
+
+</html>

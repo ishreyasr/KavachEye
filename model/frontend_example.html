@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women Safety Prediction - Frontend Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .result.safe {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.moderate {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+
+        .result.unsafe {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .recommendations {
+            margin-top: 15px;
+        }
+
+        .recommendations ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .risk-factors {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Women Safety Prediction</h1>
+        <p>Enter a location and time to get a safety assessment based on our AI analysis.</p>
+
+        <form id="predictionForm">
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location"
+                    placeholder="e.g., downtown, shopping mall, residential area" required>
+            </div>
+
+            <div class="form-group">
+                <label for="time">Date and Time:</label>
+                <input type="datetime-local" id="time" name="time" required>
+            </div>
+
+            <button type="submit">Predict Safety Level</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <p>Analyzing safety data...</p>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="result" id="result">
+            <h3>Safety Assessment</h3>
+            <div id="safetyLevel"></div>
+            <div id="safetyScore"></div>
+            <div class="risk-factors" id="riskFactors"></div>
+            <div class="recommendations" id="recommendations"></div>
+        </div>
+    </div>
+
+    <script>
+        // Set default time to current time
+        document.getElementById('time').value = new Date().toISOString().slice(0, 16);
+
+        document.getElementById('predictionForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const location = document.getElementById('location').value;
+            const time = document.getElementById('time').value;
+
+            // Show loading, hide previous results
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+
+            try {
+                const response = await fetch('http://localhost:5001/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        location: location,
+                        time: time + ':00'  // Add seconds to make it ISO format
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayResult(data);
+                } else {
+                    showError(data.error || 'An error occurred');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to connect to the server. Make sure the Flask backend is running on localhost:5001');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+
+        function displayResult(data) {
+            const resultDiv = document.getElementById('result');
+            const safetyLevel = data.safety_level;
+
+            // Set result class based on safety level
+            resultDiv.className = `result ${safetyLevel}`;
+
+            // Display safety level and score
+            document.getElementById('safetyLevel').innerHTML = `
+                <strong>Safety Level: ${safetyLevel.toUpperCase()}</strong>
+            `;
+
+            document.getElementById('safetyScore').innerHTML = `
+                <p>Safety Score: ${data.safety_score}/1.0</p>
+            `;
+
+            // Display risk factors
+            const riskFactors = data.risk_factors;
+            document.getElementById('riskFactors').innerHTML = `
+                <h4>Risk Analysis:</h4>
+                <ul>
+                    <li>Time Risk: ${riskFactors.time_risk}</li>
+                    <li>Location Risk: ${riskFactors.location_risk}</li>
+                    <li>Current Violence Level: ${riskFactors.current_violence}</li>
+                    <li>Gender Ratio: ${riskFactors.gender_ratio}</li>
+                </ul>
+            `;
+
+            // Display recommendations
+            const recommendations = data.recommendations;
+            document.getElementById('recommendations').innerHTML = `
+                <h4>Safety Recommendations:</h4>
+                <ul>
+                    ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                </ul>
+            `;
+
+            resultDiv.style.display = 'block';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Example locations for quick testing
+        const exampleLocations = [
+            'downtown',
+            'shopping mall',
+            'residential area',
+            'industrial zone',
+            'parking lot',
+            'university campus',
+            'subway station'
+        ];
+
+        // Add datalist for location suggestions
+        const locationInput = document.getElementById('location');
+        const datalist = document.createElement('datalist');
+        datalist.id = 'locationSuggestions';
+
+        exampleLocations.forEach(location => {
+            const option = document.createElement('option');
+            option.value = location;
+            datalist.appendChild(option);
+        });
+
+        locationInput.setAttribute('list', 'locationSuggestions');
+        document.body.appendChild(datalist);
+    </script>
+</body>
+
+</html>

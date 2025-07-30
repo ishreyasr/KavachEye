@@ -1,0 +1,82 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "*.html",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "images/**",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "favicon/**",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "*.js",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "*.css",
+            "use": "@vercel/static"
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/preloader",
+            "destination": "/preloader.html"
+        },
+        {
+            "source": "/login",
+            "destination": "/loginpage.html"
+        },
+        {
+            "source": "/register",
+            "destination": "/registrationpage.html"
+        },
+        {
+            "source": "/profile",
+            "destination": "/profilepage.html"
+        },
+        {
+            "source": "/analytics",
+            "destination": "/analyticspage.html"
+        },
+        {
+            "source": "/live-feeds",
+            "destination": "/livefeeds.html"
+        },
+        {
+            "source": "/issues",
+            "destination": "/issuespage.html"
+        },
+        {
+            "source": "/settings",
+            "destination": "/settingspage.html"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
+                },
+                {
+                    "key": "X-Frame-Options",
+                    "value": "DENY"
+                },
+                {
+                    "key": "X-XSS-Protection",
+                    "value": "1; mode=block"
+                }
+            ]
+        }
+    ]
+}

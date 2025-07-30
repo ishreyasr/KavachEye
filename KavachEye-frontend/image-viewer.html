@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert Image Viewer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 25%, #3498db 50%, #2980b9 75%, #1f618d 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .controls button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .controls button:hover {
+            background: #0056b3;
+        }
+
+        .controls button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .controls .left-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .controls .right-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .alerts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .alert-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .alert-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .alert-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #dee2e6;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .alert-image:hover {
+            opacity: 0.8;
+        }
+
+        .alert-details {
+            padding: 15px;
+        }
+
+        .alert-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        .alert-info {
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .alert-info strong {
+            color: #333;
+        }
+
+        .alert-type {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .type-violence {
+            background: #dc3545;
+            color: white;
+        }
+
+        .type-suspicious {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .type-emergency {
+            background: #fd7e14;
+            color: white;
+        }
+
+        .no-images {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            margin-top: 5%;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #bbb;
+        }
+
+        .stats {
+            background: #e9ecef;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .alerts-grid {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls .left-controls,
+            .controls .right-controls {
+                justify-content: center;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-images"></i> Alert Image Viewer</h1>
+            <p>View captured images from security alerts</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="totalAlerts">0</div>
+                <div class="stat-label">Total Alerts</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="totalImages">0</div>
+                <div class="stat-label">Images Captured</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="violenceCount">0</div>
+                <div class="stat-label">Violence Alerts</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="suspiciousCount">0</div>
+                <div class="stat-label">Suspicious Activity</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="left-controls">
+                <button onclick="loadAlertImages()" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button onclick="toggleView()" id="viewBtn">
+                    <i class="fas fa-th-large"></i> Grid View
+                </button>
+            </div>
+            <div class="right-controls">
+                <button onclick="exportData()" id="exportBtn">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+                <button onclick="clearAllImages()" id="clearBtn">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
+            </div>
+        </div>
+
+        <div id="content">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Loading alert images...
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for full-size image -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script>
+        const API_URL = 'https://kavacheyebackend-iodmizp7b-shreyas162004s-projects.vercel.app';
+        let currentView = 'grid';
+        let allAlerts = [];
+
+        // Load alert images when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            loadAlertImages();
+        });
+
+        async function loadAlertImages() {
+            const content = document.getElementById('content');
+            const refreshBtn = document.getElementById('refreshBtn');
+
+            try {
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+
+                content.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading alert images...</div>';
+
+                const response = await fetch(`${API_URL}/api/alerts`);
+                const data = await response.json();
+
+                if (data.status === 'success' && data.alerts) {
+                    allAlerts = data.alerts;
+                    const alertsWithImages = data.alerts.filter(alert => alert.image_data || alert.image_url);
+
+                    updateStats(data.alerts);
+
+                    if (alertsWithImages.length === 0) {
+                        content.innerHTML = `
+                            <div class="no-images">
+                                <i class="fas fa-images" style="font-size: 3rem; color: #ccc; margin-bottom: 20px;"></i>
+                                <p>No alert images found</p>
+                                <p style="font-size: 0.9rem; margin-top: 10px;">Images will appear here when alerts are sent with captured photos</p>
+                            </div>
+                        `;
+                    } else {
+                        displayAlertImages(alertsWithImages);
+                    }
+                } else {
+                    content.innerHTML = '<div class="no-images">Error loading alerts</div>';
+                }
+            } catch (error) {
+                console.error('Error loading alert images:', error);
+                content.innerHTML = '<div class="no-images">Error loading alert images</div>';
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+            }
+        }
+
+        function updateStats(alerts) {
+            const totalAlerts = alerts.length;
+            const totalImages = alerts.filter(alert => alert.image_data || alert.image_url).length;
+            const violenceCount = alerts.filter(alert => alert.type === 'violence').length;
+            const suspiciousCount = alerts.filter(alert => alert.type === 'suspicious_activity').length;
+
+            document.getElementById('totalAlerts').textContent = totalAlerts;
+            document.getElementById('totalImages').textContent = totalImages;
+            document.getElementById('violenceCount').textContent = violenceCount;
+            document.getElementById('suspiciousCount').textContent = suspiciousCount;
+        }
+
+        function displayAlertImages(alerts) {
+            const content = document.getElementById('content');
+
+            const alertsGrid = document.createElement('div');
+            alertsGrid.className = 'alerts-grid';
+
+            alerts.forEach(alert => {
+                const alertCard = createAlertCard(alert);
+                alertsGrid.appendChild(alertCard);
+            });
+
+            content.innerHTML = '';
+            content.appendChild(alertsGrid);
+        }
+
+        function createAlertCard(alert) {
+            const card = document.createElement('div');
+            card.className = 'alert-card';
+
+            // Get image source
+            let imageSrc = '';
+            if (alert.image_data) {
+                imageSrc = alert.image_data;
+            } else if (alert.image_url) {
+                imageSrc = alert.image_url;
+            }
+
+            // Determine alert type class
+            let typeClass = 'type-suspicious';
+            if (alert.type === 'violence') {
+                typeClass = 'type-violence';
+            } else if (alert.type === 'emergency') {
+                typeClass = 'type-emergency';
+            }
+
+            // Format timestamp
+            const timestamp = alert.timestamp ? new Date(alert.timestamp).toLocaleString() : 'Unknown';
+
+            card.innerHTML = `
+                <img src="${imageSrc}" alt="Alert Image" class="alert-image" onclick="openModal('${imageSrc}')" onerror="this.style.display='none'">
+                <div class="alert-details">
+                    <div class="alert-type ${typeClass}">${alert.type || 'Unknown'}</div>
+                    <div class="alert-title">${alert.message ? alert.message.substring(0, 60) + '...' : 'No message'}</div>
+                    <div class="alert-info"><strong>Location:</strong> ${alert.location || 'Unknown'}</div>
+                    <div class="alert-info"><strong>Severity:</strong> ${alert.severity || 'Unknown'}</div>
+                    <div class="alert-info"><strong>Time:</strong> ${timestamp}</div>
+                    <div class="alert-info"><strong>Status:</strong> ${alert.status || 'Unknown'}</div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        function toggleView() {
+            const viewBtn = document.getElementById('viewBtn');
+            const alertsGrid = document.querySelector('.alerts-grid');
+
+            if (currentView === 'grid') {
+                currentView = 'list';
+                viewBtn.innerHTML = '<i class="fas fa-th"></i> Grid View';
+                if (alertsGrid) {
+                    alertsGrid.style.gridTemplateColumns = '1fr';
+                }
+            } else {
+                currentView = 'grid';
+                viewBtn.innerHTML = '<i class="fas fa-th-large"></i> List View';
+                if (alertsGrid) {
+                    alertsGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(350px, 1fr))';
+                }
+            }
+        }
+
+        function exportData() {
+            if (allAlerts.length === 0) {
+                alert('No data to export');
+                return;
+            }
+
+            const exportData = allAlerts.map(alert => ({
+                id: alert.id,
+                type: alert.type,
+                severity: alert.severity,
+                message: alert.message,
+                location: alert.location,
+                timestamp: alert.timestamp,
+                status: alert.status,
+                has_image: !!(alert.image_data || alert.image_url)
+            }));
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `alert_data_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        async function clearAllImages() {
+            if (!confirm('Are you sure you want to clear all alert images? This action cannot be undone.')) {
+                return;
+            }
+
+            const clearBtn = document.getElementById('clearBtn');
+            try {
+                clearBtn.disabled = true;
+                clearBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Clearing...';
+
+                // This would require a backend endpoint to clear images
+                alert('Image clearing functionality would require backend implementation.');
+
+            } catch (error) {
+                console.error('Error clearing images:', error);
+                alert('Error clearing images');
+            } finally {
+                clearBtn.disabled = false;
+                clearBtn.innerHTML = '<i class="fas fa-trash"></i> Clear All';
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+
+</html>

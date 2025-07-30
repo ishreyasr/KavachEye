@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KavachEye - Alerts</title>
+    <link rel="icon" href="favicon/android-chrome-192x192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#2b5797">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            font-family: Arial, sans-serif;
+            height: 100%;
+            background-color: #f5f7fa;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 25%, #3498db 50%, #2980b9 75%, #1f618d 100%);
+            padding: 20px;
+            color: #ffffff;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-header {
+            position: relative;
+            bottom: 23px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .sidebar-header img {
+            position: relative;
+            right: 30px;
+            width: 120px;
+            height: 100px;
+            border-radius: 50%;
+            padding: 5px;
+        }
+
+        .sidebar-header h2 {
+            font-weight: bold;
+            font-size: 30px;
+            position: relative;
+            right: 60px;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s, background-color 0.3s;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .sidebar a:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 25%, #3498db 50%, #2980b9 75%, #1f618d 100%);
+            color: #ffffff;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            width: calc(100% - 250px);
+            position: fixed;
+            top: 0;
+            left: 250px;
+            z-index: 1000;
+        }
+
+        .navbar h1 {
+            position: relative;
+            left: 15px;
+        }
+
+        .search-filter {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container {
+            position: relative;
+            margin-right: 15px;
+        }
+
+        .search-container input {
+            background-color: #e8e9ea;
+            border: 1px solid #e1e5eb;
+            color: #333;
+            padding: 8px 30px 8px 10px;
+            border-radius: 20px;
+            width: 350px;
+            transition: width 0.3s ease;
+        }
+
+        .search-container input:focus {
+            width: 400px;
+            outline: none;
+        }
+
+        .search-container i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+
+        .location-container {
+            position: relative;
+            margin-right: 15px;
+        }
+
+        .location-container select {
+            appearance: none;
+            border: white;
+            background: none;
+            width: 10px;
+            color: #ffffff;
+            padding: 8px 20px 8px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: width 0.3s ease;
+        }
+
+        .location-container select:hover {
+            position: relative;
+            left: 12px;
+            width: 90px;
+        }
+
+        .location-container i {
+            position: absolute;
+            left: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffffff;
+            pointer-events: none;
+        }
+
+        .pipe {
+            color: #ffffff;
+            position: relative;
+            right: 7px;
+            bottom: 2px;
+            font-size: 25px;
+        }
+
+        .filter-container {
+            position: relative;
+        }
+
+        .filter-container select {
+            appearance: none;
+            border: none;
+            width: 30px;
+            padding: 8px 10px 8px 10px;
+            border-radius: 20px;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: width 0.3s ease;
+        }
+
+        .filter-container select:hover {
+            color: 173F5F;
+            position: relative;
+            left: 15px;
+            width: 90px;
+        }
+
+        .filter-container i {
+            position: absolute;
+            right: 7px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffffff;
+            pointer-events: none;
+        }
+
+        .filter-container select {
+            background: none;
+        }
+
+        .user-container {
+            position: relative;
+        }
+
+        .user-container i {
+            position: absolute;
+            right: 1px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffffff;
+            pointer-events: none;
+        }
+
+        .user-container select {
+            background-color: #000000;
+        }
+
+        .user-container select {
+            color: rgb(0, 0, 0);
+            appearance: none;
+            position: relative;
+            left: 7px;
+            border: black;
+            width: 80px;
+            padding: 8px 10px 8px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            background-color: #ffffff;
+            transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
+        }
+
+        .user-container select:hover {
+            background-color: rgb(0, 0, 0);
+            color: #ffffff;
+            border: 1px solid black;
+        }
+
+        .user-container i {
+            position: absolute;
+            right: 1px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #000000;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        .user-container select:hover+i {
+            color: #ffffff;
+        }
+
+        #profileView {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 320px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            padding: 25px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        #profileView::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid #ffffff;
+        }
+
+        #profilePicture {
+            width: 110px;
+            height: 110px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #1b2250;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        #profilePicture:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #uploadInput {
+            display: none;
+        }
+
+        #profileView h3 {
+            margin-top: 15px;
+            color: #1b2250;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        #profileView p {
+            margin-bottom: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+            color: #555555;
+        }
+
+        #profileView button {
+            width: 100%;
+            padding: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1b2250;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        #profileView button:hover {
+            background-color: #25338a;
+            transform: translateY(-3px);
+        }
+
+        .right-panel {
+            position: fixed;
+            top: 92px;
+            right: 10px;
+            width: 400px;
+            background-color: #f7f9fc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            height: calc(100vh - 90px);
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: rgb(55, 78, 85);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-right: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #3d5a80;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            margin: 20px auto;
+            position: relative;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .bar {
+            position: absolute;
+            bottom: 40px;
+            width: 80px;
+            background-color: #3498db;
+            transition: height 0.5s ease-in-out;
+        }
+
+        .bar-female {
+            left: 80px;
+            background-color: #e150a9;
+        }
+
+        .bar-male {
+            right: 80px;
+            background-color: #3498db;
+        }
+
+        .label {
+            position: absolute;
+            bottom: 10px;
+            width: 80px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .value {
+            position: absolute;
+            top: -25px;
+            width: 100%;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .chart-container h2 {
+            color: rgb(55, 78, 85);
+            font-size: 20px;
+        }
+
+        .anomaly-details {
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .anomaly-details h2 {
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: rgb(55, 78, 85);
+            border-bottom: 2px solid #173F5F;
+            padding-bottom: 10px;
+        }
+
+        .anomaly-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            border: 1px solid #e1e5eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .anomaly-item h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: rgb(55, 78, 85);
+        }
+
+        .anomaly-item p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .anomaly-item .btn {
+            display: inline-block;
+            padding: 8px 28px;
+            position: relative;
+            left: 9px;
+            background-color: rgb(55, 78, 85);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-right: 15px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .anomaly-item .btn:hover {
+            background-color: #3d5a80;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-popup-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 800px;
+            position: relative;
+        }
+
+        .video-container {
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%;
+            /* 16:9 aspect ratio */
+            position: relative;
+            background-color: #000;
+            margin-bottom: 20px;
+        }
+
+        .video-container::after {
+            content: 'Camera Feed';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .close-popup {
+            position: absolute;
+            top: 0px;
+            bottom: 12px;
+            right: 3px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .alert-message {
+            display: none;
+            position: fixed;
+            top: 85%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            z-index: 1002;
+            text-align: center;
+            font-size: 18px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert-section {
+            margin-top: 100px;
+            padding: 20px;
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .alert-header h2 {
+            position: relative;
+            bottom: 10px;
+            left: 5px;
+            font-size: 30px;
+            color: rgb(55, 78, 85);
+        }
+
+        .custom-dropdown {
+            position: relative;
+            right: 450px;
+            display: inline-block;
+            font-family: Arial, sans-serif;
+        }
+
+        .custom-dropdown-select {
+            appearance: none;
+            background-color: #ffffff;
+            border: 2px solid #3d5a80;
+            border-radius: 25px;
+            color: #3d5a80;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 12px 80px 12px 20px;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .custom-dropdown-select:hover,
+        .custom-dropdown-select:focus {
+            background-color: #f0f4f8;
+            border-color: #2c4159;
+            outline: none;
+        }
+
+        .custom-dropdown::after {
+            content: '\f078';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #3d5a80;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .custom-dropdown.open::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .custom-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            border: 2px solid #3d5a80;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            margin-top: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .custom-dropdown.open .custom-dropdown-menu {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .custom-dropdown-item {
+            color: #3d5a80;
+            cursor: pointer;
+            padding: 12px 20px;
+            transition: all 0.2s ease;
+        }
+
+        .custom-dropdown-item:hover {
+            background-color: #f0f4f8;
+        }
+
+        .custom-dropdown-item.selected {
+            background-color: #3d5a80;
+            color: #ffffff;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .issues-container {
+            position: relative;
+            width: 850px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .issue-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e1e5eb;
+            cursor: pointer;
+        }
+
+        .issue-item:last-child {
+            border-bottom: none;
+        }
+
+        .issue-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-resolved {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-solved {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .issue-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .issue-dropdown {
+            margin-left: 10px;
+            position: relative;
+        }
+
+        .issue-dropdown select {
+            appearance: none;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            color: #333;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 5px 25px 5px 10px;
+            width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .issue-dropdown::after {
+            content: '\f078';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: black;
+            pointer-events: none;
+        }
+
+        .issue-dropdown select:hover,
+        .issue-dropdown select:focus {
+            background-color: #f0f0f0;
+            border-color: #999;
+            outline: none;
+        }
+
+        .issue-details {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+
+
+        .cssbuttons-io {
+            position: relative;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            border-radius: 0.8em;
+            cursor: pointer;
+            border: none;
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            color: ghostwhite;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+        }
+
+        .cssbuttons-io svg {
+            width: 1em;
+            height: 1em;
+            margin-right: 0.3em;
+        }
+
+        .cssbuttons-io span {
+            position: relative;
+            z-index: 10;
+            transition: color 0.4s;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4em 0.8em 0.4em 0.7em;
+        }
+
+        .cssbuttons-io::before,
+        .cssbuttons-io::after {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .cssbuttons-io::before {
+            content: "";
+            background: #000;
+            width: 120%;
+            left: -10%;
+            transform: skew(30deg);
+            transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+        }
+
+        .cssbuttons-io:hover::before {
+            transform: translate3d(100%, 0, 0);
+        }
+
+        .cssbuttons-io:active {
+            transform: scale(0.95);
+        }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 15px;
+            }
+
+            .sidebar-header {
+                bottom: 0;
+                margin-bottom: 20px;
+            }
+
+            .sidebar-header img {
+                width: 80px;
+                height: 70px;
+                right: 15px;
+            }
+
+            .sidebar-header h2 {
+                font-size: 24px;
+                right: 30px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                margin-top: 20px;
+                padding: 15px;
+            }
+
+            .navbar {
+                width: 100%;
+                left: 0;
+                padding: 20px 15px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .navbar h1 {
+                text-align: center;
+                font-size: 24px;
+            }
+
+            .search-filter {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .search-container input {
+                width: 100%;
+            }
+
+            .search-container input:focus {
+                width: 100%;
+            }
+
+            .location-container,
+            .filter-container,
+            .user-container {
+                width: 100%;
+            }
+
+            .location-container select,
+            .filter-container select,
+            .user-container select {
+                width: 100%;
+                text-align: center;
+            }
+
+            .alert-section {
+                padding: 15px;
+            }
+
+            .alert-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .issues-container {
+                gap: 15px;
+            }
+
+            .issue-item {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .issue-actions {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            #profileView {
+                width: 90%;
+                right: 5%;
+                left: 5%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                padding: 10px;
+            }
+
+            .sidebar-header h2 {
+                font-size: 20px;
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+
+            .navbar {
+                padding: 15px 10px;
+            }
+
+            .navbar h1 {
+                font-size: 20px;
+            }
+
+            .alert-section {
+                padding: 10px;
+            }
+
+            .issue-item {
+                padding: 10px;
+            }
+
+            .issue-item span {
+                font-size: 14px;
+            }
+
+            .issue-status {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/logo.png" alt="Logo">
+                <h2>KavachEye</h2>
+            </div>
+            <ul>
+                <li><a href="profilepage.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="livefeeds.html"><i class="fas fa-video"></i> Live Feeds</a></li>
+                <li><a href="analyticspage.html"><i class="fas fa-chart-line"></i> Analytics</a></li>
+                <li><a href="issuespage.html"><i class="fas fa-bell"></i> Issues</a></li>
+                <li><a href="settingspage.html"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="navbar">
+                <h1 style="color: white;">Issues!</h1>
+                <div class="search-filter">
+                    <div class="search-container">
+                        <input type="text" placeholder="Search the contents...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="location-container">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <select>
+                            <option value="all" style="background-color: #cbc8c8;">Location</option>
+                            <option value="location1" style="background-color: #cbc8c8;">Location 1</option>
+                            <option value="location2" style="background-color: #cbc8c8;">Location 2</option>
+                            <option value="location3" style="background-color: #cbc8c8;">Location 3</option>
+                        </select>
+                    </div>
+                    <div class="pipe">
+                        <p> | </p>
+                    </div>
+
+                    <div class="user-container" style="position: relative;">
+                        <button class="cssbuttons-io" id="profileButton">
+                            <span>
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none"></path>
+                                    <path
+                                        d="M24 12l-5.657 5.657-1.414-1.414L21.172 12l-4.243-4.243 1.414-1.414L24 12zM2.828 12l4.243 4.243-1.414 1.414L0 12l5.657-5.657L7.07 7.757 2.828 12zm6.96 9H7.66l6.552-18h2.128L9.788 21z"
+                                        fill="currentColor"></path>
+                                </svg>
+                                profile
+                            </span>
+                        </button>
+                        <div id="profileView"
+                            style="display: none; position: absolute; top: 100%; right: 0; width: 300px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 1000; padding: 20px; margin-top: 10px;">
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <img id="profilePicture"
+                                    src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjRENEQ0RDIi8+CjxyZWN0IHg9IjMwIiB5PSI1NSIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRENEQ0RDIi8+Cjwvc3ZnPgo="
+                                    alt="Profile Picture"
+                                    style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #003366;">
+                                <h3 id="userName" style="margin-top: 10px; color: #214c62;">Loading...</h3>
+                            </div>
+                            <input type="file" id="uploadInput" accept="image/*">
+                            <div style="margin-bottom: 20px;">
+                                <p style="margin-bottom: 5px;"><strong>Username :</strong> <span
+                                        id="userUsername">Loading...</span></p>
+                                <p style="margin-bottom: 5px;"><strong>Department :</strong> <span
+                                        id="userDepartment">Loading...</span></p>
+                                <p style="margin-bottom: 5px;"><strong>Email :</strong> <span
+                                        id="userEmail">Loading...</span></p>
+                                <p style="margin-bottom: 5px;"><strong>Phone No :</strong> <span
+                                        id="userPhone">Loading...</span></p>
+                            </div>
+                            <button onclick="logOut()"
+                                style="width: 100%; padding: 10px; background-color: #214c62; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">Log
+                                Out</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert-section">
+                <div class="alert-header">
+                    <h2>Issues</h2>
+                    <div class="custom-dropdown">
+                        <button class="custom-dropdown-select" id="issueFilter">All Issues</button>
+                        <div class="custom-dropdown-menu">
+                            <div class="custom-dropdown-item selected" data-value="all">All Issues</div>
+                            <div class="custom-dropdown-item" data-value="solved">Solved Issues</div>
+                            <div class="custom-dropdown-item" data-value="resolved">Resolved Issues</div>
+                            <div class="custom-dropdown-item" data-value="pending">Pending Issues</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="issues-container">
+                    <div class="issue-item" data-status="pending">
+                        <span>Suspicious activity in Sector A</span>
+                        <div class="issue-actions">
+                            <span class="issue-status status-pending">Pending</span>
+                            <div class="issue-dropdown">
+                                <select>
+                                    <option value="">Select Action</option>
+                                    <option value="solved">Mark as Solved</option>
+                                    <option value="resolved">Mark as Resolved</option>
+                                    <option value="pending">Mark as Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="issue-details">
+                            <p>Location: Sector A</p>
+                            <p>Time Reported: 2023-06-15 14:30</p>
+                            <p>Description: Unidentified individual loitering near restricted area.</p>
+                        </div>
+                    </div>
+                    <div class="issue-item" data-status="pending">
+                        <span>Suspicious activity in Sector A</span>
+                        <div class="issue-actions">
+                            <span class="issue-status status-pending">Pending</span>
+                            <div class="issue-dropdown">
+                                <select>
+                                    <option value="">Select Action</option>
+                                    <option value="solved">Mark as Solved</option>
+                                    <option value="resolved">Mark as Resolved</option>
+                                    <option value="pending">Mark as Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="issue-details">
+                            <p>Location: Sector A</p>
+                            <p>Time Reported: 2023-06-15 14:30</p>
+                            <p>Description: Unidentified individual loitering near restricted area.</p>
+                        </div>
+                    </div>
+                    <div class="issue-item" data-status="pending">
+                        <span>Suspicious activity in Sector A</span>
+                        <div class="issue-actions">
+                            <span class="issue-status status-pending">Pending</span>
+                            <div class="issue-dropdown">
+                                <select>
+                                    <option value="">Select Action</option>
+                                    <option value="solved">Mark as Solved</option>
+                                    <option value="resolved">Mark as Resolved</option>
+                                    <option value="pending">Mark as Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="issue-details">
+                            <p>Location: Sector A</p>
+                            <p>Time Reported: 2023-06-15 14:30</p>
+                            <p>Description: Unidentified individual loitering near restricted area.</p>
+                        </div>
+                    </div>
+                    <div class="issue-item" data-status="pending">
+                        <span>Suspicious activity in Sector A</span>
+                        <div class="issue-actions">
+                            <span class="issue-status status-pending">Pending</span>
+                            <div class="issue-dropdown">
+                                <select>
+                                    <option value="">Select Action</option>
+                                    <option value="solved">Mark as Solved</option>
+                                    <option value="resolved">Mark as Resolved</option>
+                                    <option value="pending">Mark as Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="issue-details">
+                            <p>Location: Sector A</p>
+                            <p>Time Reported: 2023-06-15 14:30</p>
+                            <p>Description: Unidentified individual loitering near restricted area.</p>
+                        </div>
+                    </div>
+                    <div class="issue-item" data-status="pending">
+                        <span>Suspicious activity in Sector A</span>
+                        <div class="issue-actions">
+                            <span class="issue-status status-pending">Pending</span>
+                            <div class="issue-dropdown">
+                                <select>
+                                    <option value="">Select Action</option>
+                                    <option value="solved">Mark as Solved</option>
+                                    <option value="resolved">Mark as Resolved</option>
+                                    <option value="pending">Mark as Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="issue-details">
+                            <p>Location: Sector A</p>
+                            <p>Time Reported: 2023-06-15 14:30</p>
+                            <p>Description: Unidentified individual loitering near restricted area.</p>
+                        </div>
+                    </div>
+                    <div class="issue-item" data-status="pending">
+                        <span>Suspicious activity in Sector A</span>
+                        <div class="issue-actions">
+                            <span class="issue-status status-pending">Pending</span>
+                            <div class="issue-dropdown">
+                                <select>
+                                    <option value="">Select Action</option>
+                                    <option value="solved">Mark as Solved</option>
+                                    <option value="resolved">Mark as Resolved</option>
+                                    <option value="pending">Mark as Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="issue-details">
+                            <p>Location: Sector A</p>
+                            <p>Time Reported: 2023-06-15 14:30</p>
+                            <p>Description: Unidentified individual loitering near restricted area.</p>
+                        </div>
+                    </div>
+                    <div class="issue-item" data-status="resolved">
+                        <span>Unauthorized access attempt at Gate 2</span>
+                        <div class="issue-actions">
+                            <span class="issue-status status-resolved">Resolved</span>
+                            <div class="issue-dropdown">
+                                <select>
+                                    <option value="">Select Action</option>
+                                    <option value="solved">Mark as Solved</option>
+                                    <option value="resolved">Mark as Resolved</option>
+                                    <option value="pending">Mark as Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="issue-details">
+                            <p>Location: Gate 2</p>
+                            <p>Time Reported: 2023-06-14 09:15</p>
+                            <p>Description: Individual attempted to enter without proper credentials.</p>
+                        </div>
+                    </div>
+                    <div class="issue-item" data-status="solved">
+                        <span>Camera malfunction in Parking Lot B</span>
+                        <div class="issue-actions">
+                            <span class="issue-status status-solved">Solved</span>
+                            <div class="issue-dropdown">
+                                <select>
+                                    <option value="">Select Action</option>
+                                    <option value="solved">Mark as Solved</option>
+                                    <option value="resolved">Mark as Resolved</option>
+                                    <option value="pending">Mark as Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="issue-details">
+                            <p>Location: Parking Lot B</p>
+                            <p>Time Reported: 2023-06-13 18:45</p>
+                            <p>Description: Camera #12 stopped transmitting. Technician dispatched and fixed the issue.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="issue-item" data-status="pending">
+                        <span>Unidentified package left in lobby</span>
+                        <div class="issue-actions">
+                            <span class="issue-status status-pending">Pending</span>
+                            <div class="issue-dropdown">
+                                <select>
+                                    <option value="">Select Action</option>
+                                    <option value="solved">Mark as Solved</option>
+                                    <option value="resolved">Mark as Resolved</option>
+                                    <option value="pending">Mark as Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="issue-details">
+                            <p>Location: Main Lobby</p>
+                            <p>Time Reported: 2023-06-15 11:20</p>
+                            <p>Description: Suspicious package left unattended. Security team alerted.</p>
+                        </div>
+                    </div>
+                    <div class="issue-item" data-status="resolved">
+                        <span>Tailgating incident at employee entrance</span>
+                        <div class="issue-actions">
+                            <span class="issue-status status-resolved">Resolved</span>
+                            <div class="issue-dropdown">
+                                <select>
+                                    <option value="">Select Action</option>
+                                    <option value="solved">Mark as Solved</option>
+                                    <option value="resolved">Mark as Resolved</option>
+                                    <option value="pending">Mark as Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="issue-details">
+                            <p>Location: Employee Entrance</p>
+                            <p>Time Reported: 2023-06-14 08:30</p>
+                            <p>Description: Unauthorized individual followed an employee through secure door. Security
+                                intervened.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="chart-container">
+                <h2>Gender Detection</h2>
+                <div class="bar bar-female">
+                    <div class="value"></div>
+                    <div class="label">Female</div>
+                </div>
+                <div class="bar bar-male">
+                    <div class="value"></div>
+                    <div class="label">Male</div>
+                </div>
+            </div>
+            <div class="anomaly-details">
+                <h2>Anomaly Details</h2>
+                <div class="anomaly-item">
+                    <h3>Lone Woman Detected</h3>
+                    <p>Location: Park</p>
+                    <p>Timestamp: 10:32 PM</p>
+                    <a href="#" class="btn">View Video</a>
+                    <a href="#" class="btn">Send Alert</a>
+                </div>
+                <div class="anomaly-item">
+                    <h3>Unusual Crowd Behavior</h3>
+                    <p>Location: City Center</p>
+                    <p>Timestamp: 11:15 PM</p>
+                    <a href="#" class="btn">View Video</a>
+                    <a href="#" class="btn">Send Alert</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Video Popup -->
+    <div class="video-popup" id="videoPopup">
+        <div class="video-popup-content">
+            <span class="close-popup" onclick="closeVideoPopup()">&times;</span>
+            <div class="video-container"></div>
+            <h3 id="popupTitle"></h3>
+            <p id="popupLocation"></p>
+            <p id="popupTimestamp"></p>
+        </div>
+    </div>
+
+    <!-- Alert Message -->
+    <div class="alert-message" id="alertMessage">
+        Alert sent successfully!
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function updateChart() {
+                const femalePercentage = Math.floor(Math.random() * (60 - 40 + 1)) + 40;
+                const malePercentage = 100 - femalePercentage;
+
+                const femaleBar = document.querySelector('.bar-female');
+                const maleBar = document.querySelector('.bar-male');
+                const femaleValue = femaleBar.querySelector('.value');
+                const maleValue = maleBar.querySelector('.value');
+
+                femaleBar.style.height = `${femalePercentage * 2}px`;
+                maleBar.style.height = `${malePercentage * 2}px`;
+                femaleValue.textContent = `${femalePercentage}%`;
+                maleValue.textContent = `${malePercentage}%`;
+            }
+
+            // Update chart initially and every 2 seconds
+            updateChart();
+            setInterval(updateChart, 2000);
+
+            const profileButton = document.getElementById('profileButton');
+            const profileView = document.getElementById('profileView');
+            const userName = document.getElementById('userName');
+            const userUsername = document.getElementById('userUsername');
+            const userDepartment = document.getElementById('userDepartment');
+            const userEmail = document.getElementById('userEmail');
+            const userPhone = document.getElementById('userPhone');
+            const profilePicture = document.getElementById('profilePicture');
+            const uploadInput = document.getElementById('uploadInput');
+
+            // Function to update profile view with user data from localStorage
+            function updateProfileView() {
+                const userData = localStorage.getItem('userData');
+                if (userData) {
+                    const user = JSON.parse(userData);
+                    userName.textContent = `${user.first_name} ${user.last_name}`;
+                    userUsername.textContent = user.username || 'N/A';
+                    userDepartment.textContent = user.department || 'N/A';
+                    userEmail.textContent = user.email || 'N/A';
+                    userPhone.textContent = user.phone || 'N/A';
+                    profilePicture.src = user.profilePicture || 'images/profile picture.png';
+                } else {
+                    // If no user data, redirect to login
+                    window.location.href = 'loginpage.html';
+                }
+            }
+
+            // Update profile view on page load
+            updateProfileView();
+
+            profileButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log('Profile button clicked!');
+                profileView.style.display = profileView.style.display === 'none' ? 'block' : 'none';
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!profileView.contains(event.target) && event.target !== profileButton && !profileButton.contains(event.target)) {
+                    profileView.style.display = 'none';
+                }
+            });
+
+            profilePicture.addEventListener('click', function () {
+                uploadInput.click();
+            });
+
+            uploadInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        profilePicture.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            const customDropdown = document.querySelector('.custom-dropdown');
+            const customDropdownSelect = document.querySelector('.custom-dropdown-select');
+            const customDropdownMenu = document.querySelector('.custom-dropdown-menu');
+            const customDropdownItems = document.querySelectorAll('.custom-dropdown-item');
+
+            customDropdownSelect.addEventListener('click', () => {
+                customDropdown.classList.toggle('open');
+            });
+
+            customDropdownItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    customDropdownSelect.textContent = item.textContent;
+                    customDropdownItems.forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                    customDropdown.classList.remove('open');
+                    filterIssues(item.dataset.value);
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!customDropdown.contains(e.target)) {
+                    customDropdown.classList.remove('open');
+                }
+            });
+
+            function filterIssues(status) {
+                const issueItems = document.querySelectorAll('.issue-item');
+                issueItems.forEach(item => {
+                    if (status === 'all' || item.dataset.status === status) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            }
+
+            const issueItems = document.querySelectorAll('.issue-item');
+            issueItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const details = item.querySelector('.issue-details');
+                    details.style.display = details.style.display === 'none' ? 'block' : 'none';
+                });
+
+                const dropdown = item.querySelector('select');
+                dropdown.addEventListener('change', (e) => {
+                    e.stopPropagation();
+                    const newStatus = e.target.value;
+                    const statusSpan = item.querySelector('.issue-status');
+                    statusSpan.className = `issue-status status-${newStatus}`;
+                    statusSpan.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                    item.dataset.status = newStatus;
+
+                    const alertMessage = document.querySelector('.alert-message');
+                    alertMessage.textContent = `Issue status updated to ${newStatus}`;
+                    alertMessage.style.display = 'block';
+                    setTimeout(() => {
+                        alertMessage.style.display = 'none';
+                    }, 3000);
+                });
+            });
+
+            // New JavaScript for handling the video pop-up and alert
+            function viewVideo(title, location, timestamp) {
+                document.getElementById('videoPopup').style.display = 'flex';
+                document.getElementById('popupTitle').textContent = title;
+                document.getElementById('popupLocation').textContent = 'Location: ' + location;
+                document.getElementById('popupTimestamp').textContent = 'Timestamp: ' + timestamp;
+            }
+
+            function closeVideoPopup() {
+                document.getElementById('videoPopup').style.display = 'none';
+            }
+
+            function sendAlert() {
+                var alertMessage = document.getElementById('alertMessage');
+                alertMessage.style.display = 'block';
+                setTimeout(function () {
+                    alertMessage.style.display = 'none';
+                }, 3000); // Hide after 3 seconds
+            }
+
+            // Modify the anomaly-item buttons to use the new functions
+            document.querySelectorAll('.anomaly-item').forEach(function (item) {
+                var viewButton = item.querySelector('.btn:nth-child(4)');
+                var sendButton = item.querySelector('.btn:nth-child(5)');
+                var title = item.querySelector('h3').textContent;
+                var location = item.querySelector('p:nth-child(2)').textContent.split(': ')[1];
+                var timestamp = item.querySelector('p:nth-child(3)').textContent.split(': ')[1];
+
+                viewButton.onclick = function (e) {
+                    e.preventDefault();
+                    viewVideo(title, location, timestamp);
+                };
+
+                sendButton.onclick = function (e) {
+                    e.preventDefault();
+                    sendAlert();
+                };
+            });
+        });
+
+        function logOut() {
+            localStorage.removeItem('userData'); // Clear user data on logout
+            window.location.href = 'loginpage.html';
+        }
+    </script>
+</body>
+
+</html>
