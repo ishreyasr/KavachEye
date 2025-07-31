@@ -348,6 +348,6 @@ For licensing inquiries, contact: [ishreyasr@gmail.com]
 
 **Made with ❤️ for Women's Safety**
 
-[Privacy Policy](#) • [Terms of Service](#) • [Contact Us](#)
+[Privacy Policy](https://kavacheye.vercel.app/) • [Terms of Service](#) • [Contact Us](ishreyasr@gmail.com)
 
 </div> 
